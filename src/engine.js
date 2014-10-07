@@ -68,14 +68,20 @@ function http(verb, url, cb, q)
             {
                 switch(xhr.readyState)
                 {
-                    case 1: 
-                        // Do any pre-request work here. (Like pop up a div)
+                    case 0:
+                        // UNSENT
                         break;
-                    case 2: 
+                    case 1: 
+                        // OPENED
+                        break;
+                    case 2:
+                        // HEADERS_RECEIVED
                         break;
                     case 3:
+                        // LOADING
                         break;
                     case 4:
+                        // DONE
                         if (xhr.status == 200)
                         {
                             // only if "OK"
@@ -125,30 +131,35 @@ function _parseResponse(resp)
     console.log(resp);
     var str = _cleanString(resp.responseText);
     var xml = resp.responseXML;
+    var type = resp.responseType;
     var isParsed = true;
     
-    // Try is as JSON first, The wave of the future!
-    try
+    if (type === "json")
     {
-        return JSON.parse(str);
+        try
+        {
+            return JSON.parse(str);
+        }
+        catch(err)
+        {
+            isParsed = false;
+        }
     }
-    catch(err)
+    else if (type === "text")
     {
-        isParsed = false;
-    }
-    // Then try it as XML
-    if(xml != null && xml.childNodes.length)
-    {
-        return xml;
-    }
-    else
-    {
-        isParsed = false;
-    }
+        if(xml != null && xml.childNodes.length)
+        {
+            return xml;
+        }
+        else
+        {
+            isParsed = false;
+        }
 
-    if (!isParsed)
-    {
-        console.error("Could not parse the result:", resp)
+        if (!isParsed)
+        {
+            console.error("Could not parse the result:", resp)
+        }
     }
 }
 
