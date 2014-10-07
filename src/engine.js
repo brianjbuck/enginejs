@@ -66,7 +66,7 @@ function http(verb, url, cb, q)
 	try
 	{	
 		//this should work for most modern browsers excluding: IE Mac
-		var xhr = ( window.XMLHttpRequest ) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP") ;
+		var xhr = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP") ;
 			xhr.onreadystatechange = function()
 			{
 				switch(xhr.readyState)
@@ -106,16 +106,17 @@ function http(verb, url, cb, q)
 						{
 							self.onError(xhr, self, 2);
 						}
-					delete xhr; //clean this function from memory once we re done with it.
+					delete xhr; // clean this function from memory once we re done with it.
 					break;
 				}
 			};
 			
-			xhr.open(verb , _noCache(url) , self.async);
+			xhr.open(verb, _noCache(url), self.async);
 			
 			if(verb.toLowerCase() == 'post')
 			{
-				xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				var contenttype = "application/x-www-form-urlencoded";
+				xhr.setRequestHeader("Content-Type", contenttype);
 			}
 
 			xhr.send(qryStr);
@@ -127,33 +128,40 @@ function http(verb, url, cb, q)
 }
 
 /*--- BEGIN: RESPONSE PARSING FUNCTIONS ---*/
-function _parseResponse($$)
+function _parseResponse(resp)
 {
-	 var str = _cleanString($$.responseText);
-	 var xml = $$.responseXML;
-	//FIRST TRY IT AS XML
-	if(xml != null && xml.childNodes.length)
-	{
-		return xml;
-	} 
-	//NEXT TRY IT AS WDDX
-	if(str.indexOf("<wddxPacket") == 0)
-	{
-		return _parseWDDX(str);
-	}
-	//NEXT TRY IT AS JSON
+	console.log(resp);
+	var str = _cleanString(resp.responseText);
+	var xml = resp.responseXML;
+	var isParsed = true;
+	
+	// Try is as JSON first, The wave of the future!
 	try
 	{
 		return JSON.parse(str);
 	}
-	//NEXT TRY IT AS JavaScript
-	catch(e)
+	catch(err)
 	{
-		return _parseJS(str);
+		isParsed = false;
+	}
+	// Then try it as XML
+	if(xml != null && xml.childNodes.length)
+	{
+		return xml;
+	}
+	else
+	{
+		isParsed = false;
+	}
+
+	if (!isParsed)
+	{
+		console.error("Could not parse the result:", resp)
 	}
 }
 
-// jan.jannek@cetecom.de, 2006-02-16, weird error: some IEs show the responseText followed by the complete response (header and body again) 
+// jan.jannek@cetecom.de, 2006-02-16, weird error: some IEs show the
+// responseText followed by the complete response (header and body again) 
 function _cleanString(str)
 { 
 	//Left Trim
@@ -171,157 +179,6 @@ function _cleanString(str)
 		}
 	}
 	return str;	
-}
-
-function _parseJS(str)
-{ 
-	eval(str);
-	var r = eval(str.split('=')[0].replace(/\s/g, ''));
-	return r;
-}
-
-function _parseWDDX(str)
-{
-	var wddx = xmlStr2Doc(str);
-	var data = wddx.getElementsByTagName("data"); 
-	return _parseWDDXnode(data[0].firstChild);
-}
-
-function xmlStr2Doc(str)
-{
-	var xml;
-	if(typeof(DOMParser) == 'undefined')
-	{
-		xml=new ActiveXObject("Microsoft.XMLDOM");
-		xml.async="false";
-		xml.loadXML(str);
-	}
-	else
-	{
-		var domParser = new DOMParser();
-		xml = domParser.parseFromString(str, 'application/xml');
-	}
-	return xml;
-}
-
-function _parseWDDXnode(n)
-{
-	var val;
-	switch(n.tagName)
-	{
-		case 'string':
-			val = _parseWDDXstring(n);
-			break;
-		case 'number':
-			val = parseFloat(n.firstChild.data);
-			break;
-		case 'boolean':
-			val = n.getAttribute('value');
-			break;
-		case 'dateTime':
-			val = Date(n.firstChild.data);
-			break;
-		case 'array':
-			val = _parseWDDXarray(n);
-			break;
-		case 'struct':
-			val = _parseWDDXstruct(n);
-			break;
-		case 'recordset':
-			val = _parseWDDXrecordset(n);
-			break;
-		case 'binary':
-			val = n.firstChild.data;
-			break;
-		case 'char':
-			val = _parseWDDXchar(n);
-			break;
-		case 'null':
-			val = '';
-			break;
-		default:
-			val = n.tagName;
-			break;
-		}
-	return val;
-}
-
-function _parseWDDXstring(node)
-{
-	var items = node.childNodes;
-	var str = '';
-	for(var x = 0; x < items.length; x++)
-	{
-		if (typeof(items[x].data) != 'undefined')
-		{
-			str += items[x].data;
-		}
-		else
-		{
-			str += _parseWDDXnode(items[x]);
-		}
-	}
-	return str;
-}
-
-function _parseWDDXchar(node)
-{
-	switch(node.getAttribute('code'))
-	{
-		case '0d':
-			return '\r';
-		case '0c':
-			return '\f';
-		case '0a':
-			return '\n';
-		case '09':
-			return '\t';
-	}
-}
-
-function _parseWDDXarray(node)
-{
-	var items = node.childNodes;
-	var arr = new Array();
-
-	for(var i = 0; i < items.length; i++)
-	{
-		arr[i] = _parseWDDXnode(items[i]);
-	}
-	return arr;
-}
-
-function _parseWDDXstruct(node)
-{
-	var items = node.childNodes;
-	var obj = new Object();
-
-	for(var i = 0; i < items.length; i++)
-	{
-		obj[items[i].getAttribute('name').toLowerCase()] = _parseWDDXnode(items[i].childNodes[0]);
-	}
-	return obj;
-}
-
-function _parseWDDXrecordset(node)
-{
-	var qry = new Object();
-	var fields = node.getElementsByTagName("field");
-	var items;
-	var dataType;
-	var values;
-
-	for(var x = 0; x < fields.length; x++)
-	{
-		items = fields[x].childNodes;
-		values = new Array();
-		for(var i = 0; i < items.length; i++)
-		{
-			values[values.length] = _parseWDDXnode(items[i]);
-		}
-		qry[fields[x].getAttribute('name').toLowerCase()] = values;
-	}
-	return qry;
 }
 /*--- END: RESPONSE PARSING FUNCTIONS ---*/
 
