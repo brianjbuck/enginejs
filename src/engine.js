@@ -49,10 +49,7 @@ function jsmxConstructor()
     this.isJSMX = true;
     this.async = true;
     this.debug = false;
-    this.waitDiv = 'JSMX_loading';
     this.http = http;
-    this.onWait = _popWait;
-    this.onWaitEnd = _killWait;
     this.onError = _onError;
 }
 
@@ -72,18 +69,13 @@ function http(verb, url, cb, q)
                 switch(xhr.readyState)
                 {
                     case 1: 
-                        if(!calledOnce)
-                        { 
-                            self.onWait(self.waitDiv); 
-                            calledOnce = true;
-                        }
+                        // Do any pre-request work here. (Like pop up a div)
                         break;
                     case 2: 
                         break;
                     case 3:
                         break;
                     case 4:
-                        self.onWaitEnd(self.waitDiv);
                         if (xhr.status == 200)
                         {
                             // only if "OK"
@@ -299,26 +291,6 @@ function _noCache(url)
     return scr + '?' + qs.join('&');
 }
 
-function _popWait(id)
-{ 
-    proc = document.getElementById(id);
-    if( proc == null )
-    {
-        var p = document.createElement("div");
-        p.id = id;
-        document.body.appendChild(p);
-    }
-}
-
-function _killWait(id)
-{
-    proc = document.getElementById(id);
-    if (proc != null)
-    {
-        document.body.removeChild(proc);
-    }
-}
-
 function _onError(obj, inst, errCode)
 { 
     var e;
@@ -331,11 +303,11 @@ function _onError(obj, inst, errCode)
             e = 'Parsing Error: The value returned could not be evaluated.';
             msg = (inst.debug) ? obj.responseText : e;
             break;
-        case 2:/* server error */
+        case 2: /* server error */
             e = 'There was a problem retrieving the data:\n' + obj.status + ' : ' + obj.statusText;
             msg = (inst.debug) ? obj.responseText : e;
             break;
-        case 3:/* browser not equiped to handle XMLHttp */
+        case 3: /* browser not equiped to handle XMLHttp */
             msg = 'Unsupported browser detected.';
             return;/* you can remove this return to send a message to the screen */
             break;      
