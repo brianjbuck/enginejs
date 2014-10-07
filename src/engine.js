@@ -144,7 +144,7 @@ function _parseResponse($$)
 	//NEXT TRY IT AS JSON
 	try
 	{
-		return eval('(' + str + ')');
+		return JSON.parse(str);
 	}
 	//NEXT TRY IT AS JavaScript
 	catch(e)
