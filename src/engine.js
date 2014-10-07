@@ -57,7 +57,7 @@ function jsmxConstructor()
 }
 
 // perform the XMLHttpRequest();
-function http(verb,url,cb,q)
+function http(verb, url, cb, q)
 {
 	var self = (this.isJSMX) ? this : jsmx ;
 	//reference our arguments
@@ -84,17 +84,17 @@ function http(verb,url,cb,q)
 						break;
 					case 4:
 						self.onWaitEnd(self.waitDiv);
-						if ( xhr.status == 200 )
+						if (xhr.status == 200)
 						{
 							// only if "OK"
 							var success = true;
 							try
 							{
-								var rObj = _parseResponse( xhr );
+								var rObj = _parseResponse(xhr);
 							}
 							catch(e)
 							{ 
-								self.onError(xhr,self,1);
+								self.onError(xhr, self, 1);
 								success = false;
 							}
 							if(success)
@@ -104,14 +104,14 @@ function http(verb,url,cb,q)
 						}
 						else
 						{
-							self.onError(xhr,self,2);
+							self.onError(xhr, self, 2);
 						}
 					delete xhr; //clean this function from memory once we re done with it.
 					break;
 				}
 			};
 			
-			xhr.open( verb , _noCache(url) , self.async );
+			xhr.open(verb , _noCache(url) , self.async);
 			
 			if(verb.toLowerCase() == 'post')
 			{
@@ -122,7 +122,7 @@ function http(verb,url,cb,q)
 	}
 	catch(e)
 	{
-		self.onError(xhr,self,3);
+		self.onError(xhr, self, 3);
 	}
 }
 
@@ -144,7 +144,7 @@ function _parseResponse($$)
 	//NEXT TRY IT AS JSON
 	try
 	{
-		return eval('('+str+')');
+		return eval('(' + str + ')');
 	}
 	//NEXT TRY IT AS JavaScript
 	catch(e)
@@ -176,7 +176,7 @@ function _cleanString(str)
 function _parseJS(str)
 { 
 	eval(str);
-	var r = eval(str.split('=')[0].replace(/\s/g,''));
+	var r = eval(str.split('=')[0].replace(/\s/g, ''));
 	return r;
 }
 
@@ -329,7 +329,7 @@ function _parseWDDXrecordset(node)
 /*--- BEGIN: REQUEST PARAMETER FUNCTIONS ---*/
 function _toQueryString(obj)
 {
-	//determine the variable type
+	// determine the variable type
 	if(typeof(obj) == 'string')
 	{
 		return obj;
@@ -337,12 +337,12 @@ function _toQueryString(obj)
 
 	if(typeof(obj) == 'object')
 	{
-		//It's an Object()!
+		// It's an Object()!
 		if(typeof obj.elements == 'undefined')
 		{
 			return _object2queryString(obj);
 		}
-		//It's a form!
+		// It's a form!
 		else
 		{
 			return _form2queryString(obj);
@@ -428,7 +428,7 @@ function _form2queryString(form)
 }
 /*--- END: REQUEST PARAMETER FUNCTIONS ---*/
 
-//IE likes to cache so we will fix it's wagon!
+// IE likes to cache so we will fix it's wagon!
 function _noCache(url)
 {
 	var qs = new Array();
@@ -462,7 +462,7 @@ function _killWait(id)
 	}
 }
 
-function _onError(obj,inst,errCode)
+function _onError(obj, inst, errCode)
 { 
 	var e;
 	var msg;
@@ -470,29 +470,29 @@ function _onError(obj,inst,errCode)
 	switch(errCode)
 	{
 		case 1:
-			/*parsing error*/
+			/* parsing error */
 			e = 'Parsing Error: The value returned could not be evaluated.';
 			msg = (inst.debug) ? obj.responseText : e;
 			break;
-		case 2:/*server error*/
+		case 2:/* server error */
 			e = 'There was a problem retrieving the data:\n' + obj.status + ' : ' + obj.statusText;
 			msg = (inst.debug) ? obj.responseText : e;
 			break;
-		case 3:/*browser not equiped to handle XMLHttp*/
+		case 3:/* browser not equiped to handle XMLHttp */
 			msg = 'Unsupported browser detected.';
-			return;/*you can remove this return to send a message to the screen*/
+			return;/* you can remove this return to send a message to the screen */
 			break;		
 	}
 
 	if(inst.debug)
 	{
-		var debugWin = window.open('','error');
+		var debugWin = window.open('', 'error');
 		debugWin.document.write(msg);
 		debugWin.focus();
 	}
 	else
 	{
-		alert(msg);
+		console.error(msg);
 	}
 }
 
@@ -536,7 +536,7 @@ function _escape_utf8(data)
 		if (c == 10 || c == 13)
 		{
 			buf += '%0'+c.toString(16);
-		}//added to correct problem with hard returns
+		}// added to correct problem with hard returns
 		else if (bs.length == 1 && c>=48 && c<127 && c!=92)
 		{
 			buf += data.charAt(i);
