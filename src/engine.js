@@ -1,47 +1,36 @@
-/* --------------------------------------------------------------------------------------------------------------
-*   API:            JSMX (JavaScript MX) - Universal Ajax API for ColdFusion, PHP, .NET, or anything other language.
-*   AUTHOR:         Todd Kingham [todd@lalabird.com] with contributions by Jan Jannek [jan.jannek@Cetecom.de] and Yin Zhao [bugz_podder@yahoo.com]
-*   CREATED:        8.21.2005
-*   VERSION:        2.6.3
-*   DESCRIPTION:    This API uses XMLHttpRequest to post/get data from a ColdFusion interface.
-*                   The CFC's/CFM's will return a string representation of a JS variable: response_param.
-*                   The "onreadystatechange event handler" will eval() the string into a JS variable 
-*                   and pass the value back to the "return function". To Download a full copy of the sample 
-*                   application visit: http://www.lalabird.com/JSMX/?fa=JSMX.downloads
-*
-*   HISTORY:        2.0.0:  Todd: Scripted Out Original Version
-*                   2.1.0:  Todd: Modified for Download
-*                   2.2.0:  Todd: Modified the firstWord() function to be backward compatable with
-*                                 CF5 and to be more stable all-around.
-*                   2.3.0:  Todd: Added "wait div" functionality
-*                   2.4.0:  Todd: XML!!!! Now JSMX will allow you to pass XML Documents to the API in
-*                                 addition to the original JavaScript method.
-*                   2.4.1:  Jan:  2006-02-16, XMLHTTP requests can now handle more than one request at once. By placing the onreadystatechange event as a local variable inside the actual http() function.
-*                           Jan:  Added fix for strange IE bug that returned Header Info.
-*                           Todd: Added the jsmx object to allow users to override defaults and set custom "async", "wait" and "error" methods
-*                   2.5.0:  Todd: Added JSON Support! So now you can pass JavaScript, XML, or JSON.
-*                   2.5.1:  Todd: Version 2.5.0 was premature. Needed to fix an eval() bug when I introduced JSON.
-*                   2.5.2:  Todd: Fixed a bug in the onreadystatechange. Based on the order you call the event handler... "State Change 1" gets called twice. Added code to only process code inside 'CASE 1:' once
-*                   2.5.3:  Todd: Fixed a bug in the try/catch of the parser by placing the callback() call within the try/catch statement. This caused errors in the callback function to be "masked" and appear as "parsing errors", even when the parse was successful.
-*                   2.6.0:  Todd: Added WDDX Parser! Now you can return WDDX Strings as well.
-*                   2.6.1:  Todd: Streamlined the ClassicMode and JSON parser into one function.
-*                   2.6.2:  Todd: Replaced ParseInt() with ParseFloat() in the my WDDX Parser.
-*                           Yin: _escape_utf8() to allow UTF-8 Chars. (modified from Cal Henderson's <cal@iamcal.com> version)
-*                   2.6.3:  Todd: _escape_utf8() was choking on CR+LF: chr(13) && chr(10) ... modified function to correct problem.
+/* -----------------------------------------------------------------------------
+* The MIT License (MIT)
+* 
+* Copyright (c) 2014 Brian Buck
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
 *
 *
-*   LICENSE:        THIS IS AN OPEN SOURCE API. YOU ARE FREE TO USE THIS API IN ANY APPLICATION,
-*                   TO COPY IT OR MODIFY THE FUNCTIONS FOR YOUR OWN NEEDS, AS LONG THIS HEADER INFORMATION
-*                   REMAINS IN TACT AND YOU DON'T CHARGE ANY MONEY FOR IT. USE THIS API AT YOUR OWN
-*                   RISK. NO WARRANTY IS EXPRESSED OR IMPLIED, AND NO LIABILITY ASSUMED FOR THE RESULT OF
-*                   USING THIS API.
+* DESCRIPTION:
+*   This API uses XMLHttpRequest to post/get data from a JavaScript interface.
+*   To Download a full copy of the sample application visit:
+*   https://github.com/brianjbuck/enginejs
 *
-*                   THIS API IS LICENSED UNDER THE CREATIVE COMMONS ATTRIBUTION-SHAREALIKE LICENSE.
-*                   FOR THE FULL LICENSE TEXT PLEASE VISIT: http://creativecommons.org/licenses/by-sa/2.5/
 *
------------------------------------------------------------------------------------------------------------------*/
-// UNCOMMENT THE FOLLOWING LINE IF YOU WILL BE RETURNING QUERY OBJECTS. (note: you may need to point the SRC to an alternate location.
-/*document.writeln('<SCRIPT TYPE="text/javascript" LANGUAGE="JavaScript" SRC="/CFIDE/scripts/wddx.js"></SCRIPT >');*/
+*  Originally created by Todd Kingham [todd@lalabird.com] with contributions by
+*  Jan Jannek [jan.jannek@Cetecom.de] and Yin Zhao [bugz_podder@yahoo.com]
+------------------------------------------------------------------------------*/
 
 var jsmx = new jsmxConstructor();
 function jsmxConstructor()
@@ -59,7 +48,6 @@ function http(verb, url, cb, q)
     var self = (this.isJSMX) ? this : jsmx ;
     //reference our arguments
     var qryStr = (!q) ? '' : _toQueryString(q);
-    var calledOnce = false; //this is to prevent a bug in onreadystatechange... "state 1" gets called twice.
     try
     {   
         //this should work for most modern browsers excluding: IE Mac
