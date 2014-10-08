@@ -128,39 +128,23 @@ function http(verb, url, cb, q)
 /*--- BEGIN: RESPONSE PARSING FUNCTIONS ---*/
 function _parseResponse(resp)
 {
-    console.log(resp);
     var str = _cleanString(resp.responseText);
     var xml = resp.responseXML;
     var type = resp.responseType;
-    var isParsed = true;
     
-    if (type === "json")
+    try
     {
-        try
-        {
-            return JSON.parse(str);
-        }
-        catch(err)
-        {
-            isParsed = false;
-        }
+        return JSON.parse(str);
     }
-    else if (type === "text")
+    catch(err)
     {
-        if(xml != null && xml.childNodes.length)
-        {
-            return xml;
-        }
-        else
-        {
-            isParsed = false;
-        }
-
-        if (!isParsed)
-        {
-            console.error("Could not parse the result:", resp)
-        }
+        // fall through to try parsing as xml
     }
+    if(xml != null && xml.childNodes.length)
+    {
+        return xml;
+    }
+    console.error("Could not parse the response:", resp);
 }
 
 // jan.jannek@cetecom.de, 2006-02-16, weird error: some IEs show the
