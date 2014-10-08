@@ -1,0 +1,34 @@
+{% load staticfiles %}
+<html>
+<head>
+<script type="text/javascript" src="{% static 'engine.js' %}"></script>
+<script type="text/javascript">
+function getajax()
+{
+	  var form = document.getElementById("test_form");
+	  var format = form["format"].value;
+	  if (format === "json")
+			http("get", "getjson/", callback);
+		else if (format === "xml")
+			http("get", "getxml/", callback);
+}
+
+function callback(obj)
+{
+		console.log(obj);
+}
+</script>
+</head>
+<body>
+<p>{{ now }}</p>
+<p>
+	<form id="test_form">
+		<label>JSON</label>
+		<input type="radio" name="format" value="json" checked="checked" />
+		<label>XML</label>
+		<input type="radio" name="format" value="xml">
+		<input type="button" value="Get Ajax" onclick="getajax();" />
+	</form>
+</p>
+</body>
+</html>
