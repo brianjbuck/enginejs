@@ -341,13 +341,13 @@ function _escape_utf8(data)
             bs[2] = 0x80 | ((c & 0xFC0) >>> 6);
             bs[3] = 0x80 | (c & 0x3F);
         }
-        else if (c>0x800)
+        else if (c > 0x800)
         {
             bs[0] = 0xE0 | ((c & 0xF000) >>> 12);
             bs[1] = 0x80 | ((c & 0xFC0) >>> 6);
             bs[2] = 0x80 | (c & 0x3F);
         }
-        else  if (c>0x80)
+        else  if (c > 0x80)
         {
             bs[0] = 0xC0 | ((c & 0x7C0) >>> 6);
             bs[1] = 0x80 | (c & 0x3F);
