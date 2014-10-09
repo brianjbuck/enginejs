@@ -32,6 +32,23 @@
 *  Jan Jannek [jan.jannek@Cetecom.de] and Yin Zhao [bugz_podder@yahoo.com]
 ------------------------------------------------------------------------------*/
 
+// The public API is http.get()/http.pos(). This will also allow further 
+// use of HTTP verbs such as put/delete etc.
+
+var http = http || {};
+
+http.get = function(url, callback, params) {
+    makeRequest("get", url, callback, params);
+};
+
+http.post = function(url, callback, params) {
+    makeRequest("post", url, callback, params);
+};
+
+var Request = function() {
+
+}
+
 var jsmx = new jsmxConstructor();
 function jsmxConstructor()
 {
@@ -43,7 +60,7 @@ function jsmxConstructor()
 }
 
 // perform the XMLHttpRequest();
-function http(verb, url, cb, q)
+function makeRequest(verb, url, cb, q)
 {
     var self = (this.isJSMX) ? this : jsmx ;
     //reference our arguments
@@ -52,60 +69,60 @@ function http(verb, url, cb, q)
     {   
         //this should work for most modern browsers excluding: IE Mac
         var xhr = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP") ;
-            xhr.onreadystatechange = function()
+        xhr.onreadystatechange = function()
+        {
+            switch(xhr.readyState)
             {
-                switch(xhr.readyState)
-                {
-                    case 0:
-                        // UNSENT
-                        break;
-                    case 1: 
-                        // OPENED
-                        break;
-                    case 2:
-                        // HEADERS_RECEIVED
-                        break;
-                    case 3:
-                        // LOADING
-                        break;
-                    case 4:
-                        // DONE
-                        if (xhr.status == 200)
-                        {
-                            // only if "OK"
-                            var success = true;
-                            try
-                            {
-                                var rObj = _parseResponse(xhr);
-                            }
-                            catch(e)
-                            { 
-                                self.onError(xhr, self, 1);
-                                success = false;
-                            }
-                            if(success)
-                            {
-                                cb(rObj);
-                            }
-                        }
-                        else
-                        {
-                            self.onError(xhr, self, 2);
-                        }
-                    delete xhr; // clean this function from memory once we re done with it.
+                case 0:
+                    // UNSENT
                     break;
-                }
-            };
-            
-            xhr.open(verb, _noCache(url), self.async);
-            
-            if(verb.toLowerCase() == 'post')
-            {
-                var contenttype = "application/x-www-form-urlencoded";
-                xhr.setRequestHeader("Content-Type", contenttype);
+                case 1: 
+                    // OPENED
+                    break;
+                case 2:
+                    // HEADERS_RECEIVED
+                    break;
+                case 3:
+                    // LOADING
+                    break;
+                case 4:
+                    // DONE
+                    if (xhr.status == 200)
+                    {
+                        // only if "OK"
+                        var success = true;
+                        try
+                        {
+                            var rObj = _parseResponse(xhr);
+                        }
+                        catch(e)
+                        { 
+                            self.onError(xhr, self, 1);
+                            success = false;
+                        }
+                        if(success)
+                        {
+                            cb(rObj);
+                        }
+                    }
+                    else
+                    {
+                        self.onError(xhr, self, 2);
+                    }
+                delete xhr; // clean this function from memory once we re done with it.
+                break;
             }
+        };
+        
+        xhr.open(verb, _noCache(url), self.async);
+        
+        if(verb.toLowerCase() == 'post')
+        {
+            var contenttype = "application/x-www-form-urlencoded";
+            xhr.setRequestHeader("Content-Type", contenttype);
+        }
 
-            xhr.send(qryStr);
+        xhr.send(qryStr);
     }
     catch(e)
     {
