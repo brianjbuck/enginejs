@@ -5,30 +5,60 @@
 <script type="text/javascript">
 function getajax()
 {
-	  var form = document.getElementById("test_form");
-	  var format = form["format"].value;
-	  if (format === "json")
-			http("get", "getjson/", callback);
-		else if (format === "xml")
-			http("get", "getxml/", callback);
+    var form = document.getElementById("test_form");
+    var format = form["format"].value;
+    if (format === "json")
+      http.get("getjson/", callback);
+    else if (format === "xml")
+      http.get("getxml/", callback);
+}
+
+function postajax()
+{
+    var form = document.getElementById("test_post_form");
+    var csrf_token = form["csrfmiddlewaretoken"].value;
+    var first_name = form["first_name"].value;
+    var format = form["format"].value;
+
+    params = new Object();
+    params["first_name"] = first_name;
+    params["csrfmiddlewaretoken"] = csrf_token;
+
+    if (format === "json")
+      http.post("postjson/", callback, params);
+    else if (format === "xml")
+      http.post("postxml/", callback, params);
 }
 
 function callback(obj)
 {
-		console.log(obj);
+    console.log(obj);
 }
 </script>
 </head>
 <body>
 <p>{{ now }}</p>
 <p>
-	<form id="test_form">
-		<label>JSON</label>
-		<input type="radio" name="format" value="json" checked="checked" />
-		<label>XML</label>
-		<input type="radio" name="format" value="xml">
-		<input type="button" value="Get Ajax" onclick="getajax();" />
-	</form>
+  <form id="test_form">
+    <label>JSON</label>
+    <input type="radio" name="format" value="json" checked="checked" />
+    <label>XML</label>
+    <input type="radio" name="format" value="xml">
+    <input type="button" value="Get Ajax" onclick="getajax();" />
+  </form>
+</p>
+<hr />
+<p>
+  <form id="test_post_form">
+    {% csrf_token %}
+    <label>JSON</label>
+    <input type="radio" name="format" value="json" checked="checked" />
+    <label>XML</label>
+    <input type="radio" name="format" value="xml">
+    <br />
+    <input type="text" name="first_name" />
+    <input type="button" value="Post Ajax" onclick="postajax();" />
+  </form>
 </p>
 </body>
 </html>

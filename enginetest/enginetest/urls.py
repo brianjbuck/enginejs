@@ -9,6 +9,8 @@ urlpatterns = patterns('',
     url(r'^$', views.index, name="index"),
     url(r'^getjson/$', views.get_json),
     url(r'^getxml/$', views.get_xml),
+    url(r'^postjson/$', views.post_json),
+    url(r'^postxml/$', views.post_xml),
 )
 
 if settings.DEBUG:
