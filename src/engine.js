@@ -179,15 +179,15 @@ function _cleanString(str)
 function _toQueryString(obj)
 {
     // determine the variable type
-    if(typeof(obj) == 'string')
+    if(typeof(obj) === 'string')
     {
         return obj;
     }
 
-    if(typeof(obj) == 'object')
+    if(typeof(obj) === 'object')
     {
         // It's an Object()!
-        if(typeof obj.elements == 'undefined')
+        if(typeof obj.elements === 'undefined')
         {
             return _object2queryString(obj);
         }
@@ -223,11 +223,11 @@ function _form2queryString(form)
                 switch(elm.type.split('-')[0])
                 {
                     case "select":
-                        for(var s=0;s < elm.options.length;s++)
+                        for(var s = 0; s < elm.options.length; s++)
                         {
                             if(elm.options[s].selected)
                             {
-                                if(typeof(obj[nm]) == 'undefined')
+                                if(typeof(obj[nm]) =='' 'undefined')
                                 {
                                     obj[nm] = new Array();
                                 }
@@ -238,7 +238,7 @@ function _form2queryString(form)
                     case "radio":
                         if(elm.checked)
                         {
-                            if(typeof(obj[nm]) == 'undefined')
+                            if(typeof(obj[nm]) === 'undefined')
                             {
                                 obj[nm] = new Array();
                             }
@@ -248,7 +248,7 @@ function _form2queryString(form)
                     case "checkbox":
                         if(elm.checked)
                         {
-                            if(typeof(obj[nm]) == 'undefined')
+                            if(typeof(obj[nm]) === 'undefined')
                             {
                                 obj[nm] = new Array();
                             }
@@ -256,7 +256,7 @@ function _form2queryString(form)
                         }   
                         break;                      
                     default:
-                        if(typeof(obj[nm]) == 'undefined')
+                        if(typeof(obj[nm]) === 'undefined')
                         {
                             obj[nm] = new Array();
                         }
@@ -327,7 +327,7 @@ function _onError(obj, inst, errCode)
 
 function _escape_utf8(data)
 {
-    if (data=="" || data == null)
+    if (data == "" || data == null)
     {
         return "";
     }
@@ -337,7 +337,7 @@ function _escape_utf8(data)
 
     for (var i = 0; i < data.length; i++)
     {
-        var c=data.charCodeAt(i);
+        var c = data.charCodeAt(i);
         var bs = [];
         if (c > 0x10000)
         {
@@ -362,11 +362,11 @@ function _escape_utf8(data)
             bs[0] = c;
         }
         
-        if (c == 10 || c == 13)
+        if (c === 10 || c === 13)
         {
-            buf += '%0'+c.toString(16);
+            buf += '%0' + c.toString(16);
         }// added to correct problem with hard returns
-        else if (bs.length == 1 && c>=48 && c<127 && c!=92)
+        else if (bs.length === 1 && c >= 48 && c < 127 && c != 92)
         {
             buf += data.charAt(i);
         }
