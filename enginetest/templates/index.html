@@ -5,27 +5,27 @@
 <script type="text/javascript">
 function make_request()
 {
-    var form = document.getElementById("test_form");
-    var csrf_token = form["csrfmiddlewaretoken"].value;
-    var first_name = form["first_name"].value;
-    var format = form["format"].value;
-    var method = form["method"].value;
+		var form = document.getElementById("test_form");
+		var csrf_token = form["csrfmiddlewaretoken"].value;
+		var first_name = form["first_name"].value;
+		var format = form["format"].value;
+		var method = form["method"].value;
 
-    params = new Object();
-    params["first_name"] = first_name;
-    params["csrfmiddlewaretoken"] = csrf_token;
+		params = new Object();
+		params["first_name"] = first_name;
+		params["csrfmiddlewaretoken"] = csrf_token;
 
-    var url = method.toLowerCase() + format.toLowerCase() + "/";
+		var url = method.toLowerCase() + format.toLowerCase() + "/";
 
-    if (method.toLowerCase() === "get")
-      http.get(url, callback);
-    else if (method.toLowerCase() === "post")
-      http.post(url, callback, params);
+		if (method.toLowerCase() === "get")
+			http.get(url, callback);
+		else if (method.toLowerCase() === "post")
+			http.post(url, callback, params);
 }
 
 function callback(obj)
 {
-    console.log(obj);
+		console.log(obj);
 }
 </script>
 <style type="text/css">
@@ -34,29 +34,29 @@ function callback(obj)
 </head>
 <body>
 <div id="header">
-  <p>Server Time:<br />{{ now }}</p>
+	<p>Server Time:<br />{{ now }}</p>
 </div>
 <div>
-  <p>
-    <form id="test_form">
-      {% csrf_token %}
-      <p class="label-header">Format</p>
-      <label>JSON</label>
-      <input type="radio" name="format" value="json" checked="checked" />
-      <label>XML</label>
-      <input type="radio" name="format" value="xml">
-      <p class="label-header">Method</p>
-      <label>GET</label>
-      <input type="radio" name="method" value="GET" checked="checked" />
-      <label>POST</label>
-      <input type="radio" name="method" value="POST">
-      <p class="label-header">Data</p>
-      <input type="text" name="first_name" />
-      <br />
-      <br />
-      <input type="button" value="Make Request" onclick="make_request()" />
-    </form>
-  </p>
+	<p>
+		<form id="test_form">
+			{% csrf_token %}
+			<p class="label-header">Format</p>
+			<label>JSON</label>
+			<input type="radio" name="format" value="json" checked="checked" />
+			<label>XML</label>
+			<input type="radio" name="format" value="xml">
+			<p class="label-header">Method</p>
+			<label>GET</label>
+			<input type="radio" name="method" value="GET" checked="checked" />
+			<label>POST</label>
+			<input type="radio" name="method" value="POST">
+			<p class="label-header">Data</p>
+			<input type="text" name="first_name" />
+			<br />
+			<br />
+			<input type="button" value="Make Request" onclick="make_request()" />
+		</form>
+	</p>
 </div>
 </body>
 </html>
