@@ -227,7 +227,7 @@ function _form2queryString(form)
                         {
                             if(elm.options[s].selected)
                             {
-                                if(typeof(obj[nm]) =='' 'undefined')
+                                if(typeof(obj[nm]) === 'undefined')
                                 {
                                     obj[nm] = new Array();
                                 }
